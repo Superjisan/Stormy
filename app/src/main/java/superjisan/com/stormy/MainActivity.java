@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.okhttp.Call;
@@ -29,15 +30,22 @@ public class MainActivity extends Activity {
 
     private CurrentWeather mCurrentWeather;
 
+    private TextView mTemperatureLabel;
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mTemperatureLabel = (TextView)findViewById(R.id.temperatureLabel);
+
         String apiKey = "7d0ff8fcc4044e030dc77f34aabfd1a6";
         double latitude = 37.826;
         double longitude = -122.423 ;
         String forecasturl  = "https://api.forecast.io/forecast/"+apiKey+"/"+
                 latitude+","+longitude;
+
+
          if(isNetworkAvailable()) {
              OkHttpClient client = new OkHttpClient();
              Request request = new Request.Builder()

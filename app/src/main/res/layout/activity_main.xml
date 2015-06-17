@@ -70,24 +70,23 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="10dp"
-        android:weightSum="100"
-        android:id="@+id/linearLayout">
+        android:id="@+id/linearLayout"
+        android:weightSum="100">
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="50"
-            android:id="@+id/"
             android:focusableInTouchMode="true">
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="HUMIDITY"
                 android:id="@+id/humidityLabel"
                 android:textColor="#80ffffff"
-                android:gravity="center_horizontal"/>
+                android:gravity="center_horizontal" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -125,10 +124,10 @@
                 android:textColor="@android:color/white"
                 android:gravity="center_horizontal"/>
         </LinearLayout>
-    </LinearLayout>
 
+    </LinearLayout>
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Stormy with a chance of meatballs"
         android:id="@+id/textView"
