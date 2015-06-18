@@ -1,14 +1,12 @@
 package superjisan.com.stormy;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -74,6 +72,12 @@ public class MainActivity extends Activity {
                          Log.v(TAG, jsonData);
                          if (response.isSuccessful()) {
                             mCurrentWeather = getCurrentDetails(jsonData);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    updateDisplay();
+                                }
+                            });
                          } else {
                              alertUserAboutError();
                          }
@@ -89,6 +93,17 @@ public class MainActivity extends Activity {
          }else{
              Toast.makeText(this, getString(R.string.network_unavailable_message), Toast.LENGTH_LONG).show();
          }
+    }
+
+    private void updateDisplay() {
+        mTemperatureLabel.setText(mCurrentWeather.getTemperature() + "");
+        mTimeLabel.setText("At " + mCurrentWeather.getFormattedTime() + " it will be");
+        mHumidityValue.setText(mCurrentWeather.getHumidity() + "");
+        mPrecipValue.setText(mCurrentWeather.getPrecipChance() + "%");
+        mSummaryLabel.setText(mCurrentWeather.getSummary());
+
+        Drawable drawable = getResources().getDrawable(mCurrentWeather.getIconId());
+        mIconImageView.setImageDrawable(drawable);
     }
 
     private CurrentWeather getCurrentDetails(String jsonData) throws JSONException {
