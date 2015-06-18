@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +24,9 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
 
 public class MainActivity extends Activity {
 
@@ -30,14 +34,18 @@ public class MainActivity extends Activity {
 
     private CurrentWeather mCurrentWeather;
 
-    private TextView mTemperatureLabel;
+    @InjectView(R.id.timeLabel) TextView mTimeLabel;
+    @InjectView(R.id.temperatureLabel) TextView mTemperatureLabel;
+    @InjectView(R.id.humidityValue) TextView mHumidityValue;
+    @InjectView(R.id.precipValue) TextView mPrecipValue;
+    @InjectView(R.id.summaryLabel) TextView mSummaryLabel;
+    @InjectView(R.id.iconImageView)ImageView mIconImageView;
 
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mTemperatureLabel = (TextView)findViewById(R.id.temperatureLabel);
+        ButterKnife.inject(this);
 
         String apiKey = "7d0ff8fcc4044e030dc77f34aabfd1a6";
         double latitude = 37.826;
