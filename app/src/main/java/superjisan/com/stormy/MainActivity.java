@@ -7,7 +7,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +40,8 @@ public class MainActivity extends Activity {
     @InjectView(R.id.precipValue) TextView mPrecipValue;
     @InjectView(R.id.summaryLabel) TextView mSummaryLabel;
     @InjectView(R.id.iconImageView)ImageView mIconImageView;
+    @InjectView(R.id.refreshImageView)ImageView mRefreshImageView;
+    @InjectView(R.id.progressBar)ProgressBar mProgressBar;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,57 +49,98 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
 
+        mProgressBar.setVisibility(View.INVISIBLE);
+
+        final double latitude = 37.826;
+        final double longitude = -122.423 ;
+
+        mRefreshImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getForecast(latitude, longitude);
+            }
+        });
+
+        getForecast(latitude, longitude);
+    }
+
+    private void getForecast(double latitude, double longitude) {
         String apiKey = "7d0ff8fcc4044e030dc77f34aabfd1a6";
-        double latitude = 37.826;
-        double longitude = -122.423 ;
+
         String forecasturl  = "https://api.forecast.io/forecast/"+apiKey+"/"+
                 latitude+","+longitude;
 
 
-         if(isNetworkAvailable()) {
-             OkHttpClient client = new OkHttpClient();
-             Request request = new Request.Builder()
-                     .url(forecasturl)
-                     .build();
+        if(isNetworkAvailable()) {
+            toggleRefresh();
 
-             Call call = client.newCall(request);
-             call.enqueue(new Callback() {
-                 @Override
-                 public void onFailure(Request request, IOException e) {
-                     alertUserAboutError();
-                 }
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder()
+                    .url(forecasturl)
+                    .build();
 
-                 @Override
-                 public void onResponse(Response response) throws IOException {
-                     try {
-                         String jsonData = response.body().string();
-                         Log.v(TAG, jsonData);
-                         if (response.isSuccessful()) {
-                            mCurrentWeather = getCurrentDetails(jsonData);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    updateDisplay();
-                                }
-                            });
-                         } else {
-                             alertUserAboutError();
-                         }
-                     } catch (IOException e) {
-                         Log.e(TAG, "Exception caught", e);
-                     } catch (JSONException e){
-                         Log.e(TAG, "Exception caught", e);
-                     }
+            Call call = client.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(Request request, IOException e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            toggleRefresh();
+                        }
+                    });
+                    alertUserAboutError();
+                }
 
-                 }
-             });
+                @Override
+                public void onResponse(Response response) throws IOException {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            toggleRefresh();
+                        }
+                    });
 
-         }else{
-             Toast.makeText(this, getString(R.string.network_unavailable_message), Toast.LENGTH_LONG).show();
-         }
+
+                    try {
+                        String jsonData = response.body().string();
+                        Log.v(TAG, jsonData);
+                        if (response.isSuccessful()) {
+                           mCurrentWeather = getCurrentDetails(jsonData);
+                           runOnUiThread(new Runnable() {
+                               @Override
+                               public void run() {
+                                   updateDisplay();
+                               }
+                           });
+                        } else {
+                            alertUserAboutError();
+                        }
+                    } catch (IOException e) {
+                        Log.e(TAG, "Exception caught", e);
+                    } catch (JSONException e){
+                        Log.e(TAG, "Exception caught", e);
+                    }
+
+                }
+            });
+
+        }else{
+            Toast.makeText(this, getString(R.string.network_unavailable_message), Toast.LENGTH_LONG).show();
+        }
     }
 
-    private void updateDisplay() {
+    private void toggleRefresh() {
+        if(mProgressBar.getVisibility() == View.INVISIBLE){
+            mProgressBar.setVisibility(View.VISIBLE);
+            mRefreshImageView.setVisibility(View.INVISIBLE);
+        }else{
+            mProgressBar.setVisibility(View.INVISIBLE);
+            mRefreshImageView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void updateDisplay(){
         mTemperatureLabel.setText(mCurrentWeather.getTemperature() + "");
         mTimeLabel.setText("At " + mCurrentWeather.getFormattedTime() + " it will be");
         mHumidityValue.setText(mCurrentWeather.getHumidity() + "");
